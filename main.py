@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 # Tên tệp lưu trữ dữ liệu
 TXT_FILE = "contacts.txt"
@@ -30,22 +31,28 @@ def luu_du_lieu(contacts):
     except Exception as e:
         print(f"Lỗi khi lưu file: {e}")
 
+def kiem_tra_sdt(phone):
+    """Kiểm tra định dạng số điện thoại Việt Nam (10 số, bắt đầu bằng 0)"""
+    # Regex cho SĐT VN: Bắt đầu bằng 0, theo sau là 9 chữ số
+    pattern = r"^(0[3|5|7|8|9])[0-9]{8}$"
+    return re.match(pattern, phone)
+
 def them_lien_he(contacts):
-    """Thêm liên hệ mới và xác thực dữ liệu [cite: 36, 74]"""
+    """Thêm liên hệ mới với xác thực SĐT chuẩn VN"""
     print("\n--- THÊM LIÊN HỆ MỚI ---")
     name = input("Nhập tên: ").strip()
     while not name:
         name = input("Tên không được để trống. Nhập lại: ").strip()
     
-    phone = input("Nhập số điện thoại: ").strip()
-    while not phone.isdigit(): # Xác thực chỉ nhập số 
-        phone = input("Số điện thoại phải là chữ số. Nhập lại: ").strip()
+    phone = input("Nhập số điện thoại (VD: 0912345678): ").strip()
+    while not kiem_tra_sdt(phone):
+        phone = input("SĐT không hợp lệ (Phải có 10 số, bắt đầu bằng 03, 05, 07, 08, 09). Nhập lại: ").strip()
         
     email = input("Nhập email: ").strip()
     contacts.append({"name": name, "phone": phone, "email": email})
     luu_du_lieu(contacts)
     print("Thêm thành công!")
-
+    
 def hien_thi_danh_ba(contacts):
     """Hiển thị danh sách dưới dạng bảng [cite: 38, 74]"""
     if not contacts:
