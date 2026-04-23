@@ -9,66 +9,97 @@ JSON_FILE = "contacts.json"
 # --- CHỨC NĂNG HỆ THỐNG ---
 
 def tai_du_lieu():
-    """Tải dữ liệu từ tệp .txt khi khởi động [cite: 34, 77]"""
+    """Tải dữ liệu từ tệp .txt"""
     contacts = []
     if not os.path.exists(TXT_FILE):
         return contacts
     try:
         with open(TXT_FILE, "r", encoding="utf-8") as f:
             for line in f:
-                name, phone, email = line.strip().split("|")
-                contacts.append({"name": name, "phone": phone, "email": email})
+                parts = line.strip().split("|")
+                if len(parts) == 4:
+                    contacts.append({
+                        "id": parts[0], 
+                        "name": parts[1], 
+                        "phone": parts[2], 
+                        "email": parts[3]
+                    })
     except Exception as e:
         print(f"Lỗi khi tải file: {e}")
     return contacts
 
 def luu_du_lieu(contacts):
-    """Lưu dữ liệu vào tệp .txt [cite: 34, 77]"""
+    """Lưu dữ liệu vào tệp .txt"""
     try:
         with open(TXT_FILE, "w", encoding="utf-8") as f:
             for c in contacts:
-                f.write(f"{c['name']}|{c['phone']}|{c['email']}\n")
+                f.write(f"{c['id']}|{c['name']}|{c['phone']}|{c['email']}\n")
     except Exception as e:
         print(f"Lỗi khi lưu file: {e}")
 
 def kiem_tra_sdt(phone):
-    """Kiểm tra định dạng số điện thoại Việt Nam (10 số, bắt đầu bằng 0)"""
-    # Regex cho SĐT VN: Bắt đầu bằng 0, theo sau là 9 chữ số
+    """Kiểm tra định dạng số điện thoại Việt Nam"""
     pattern = r"^(0[3|5|7|8|9])[0-9]{8}$"
     return re.match(pattern, phone)
 
 def them_lien_he(contacts):
-    """Thêm liên hệ mới với xác thực SĐT chuẩn VN"""
+    """Thêm liên hệ mới: Tự động tạo ID tuần tự (01, 02, 03...)"""
     print("\n--- THÊM LIÊN HỆ MỚI ---")
+    
     name = input("Nhập tên: ").strip()
     while not name:
         name = input("Tên không được để trống. Nhập lại: ").strip()
-    phone = input("Nhập số điện thoại (84+): ").strip()
-    while not kiem_tra_sdt(phone):
-        phone = input("SĐT không hợp lệ (Phải có 10 số, bắt đầu bằng 03, 05, 07, 08, 09). Nhập lại: ").strip()
+    
+    while True:
+        phone = input("Nhập số điện thoại (10 số): ").strip()
         
+        if not kiem_tra_sdt(phone):
+            print("❌ SĐT không hợp lệ (Phải có 10 số, bắt đầu bằng 03, 05, 07, 08, 09).")
+            continue
+            
+        trung_lap = any(c['phone'] == phone for c in contacts)
+        if trung_lap:
+            print(f"⚠️ Lỗi: Số điện thoại {phone} đã tồn tại trong danh bạ!")
+            lua_chon = input("Nhập 'r' để thử lại, hoặc phím bất kỳ để thoát: ").lower()
+            if lua_chon != 'r':
+                return 
+        else:
+            break 
+
     email = input("Nhập email: ").strip()
-    contacts.append({"name": name, "phone": phone, "email": email})
+    
+    # --- THUẬT TOÁN TẠO ID TỰ ĐỘNG TĂNG ---
+    if not contacts:
+        # Nếu danh bạ trống, bắt đầu từ 1
+        new_id_num = 1
+    else:
+        # Tìm ID lớn nhất hiện tại (phải ép kiểu int để so sánh toán học)
+        max_id = max(int(c['id']) for c in contacts)
+        new_id_num = max_id + 1
+        
+    # Format số nguyên thành chuỗi có 2 chữ số (VD: 1 -> "01", 12 -> "12")
+    unique_id = f"{new_id_num:02d}"
+    # ----------------------------------------
+
+    contacts.append({"id": unique_id, "name": name, "phone": phone, "email": email})
     luu_du_lieu(contacts)
-    print("Thêm thành công!")
+    print(f"✅ Đã thêm thành công! Mã ID của {name} là: {unique_id}")
 
 def hien_thi_danh_ba(contacts):
-    """Hiển thị danh sách dưới dạng bảng [cite: 38, 74]"""
     if not contacts:
         print("\nDanh bạ trống.")
         return
     
-    print("\n" + "="*50)
-    print(f"{'STT':<5} | {'Họ và Tên':<20} | {'Số điện thoại':<15} | {'Email'}")
-    print("-" * 50)
-    for i, c in enumerate(contacts, 1):
-        print(f"{i:<5} | {c['name']:<20} | {c['phone']:<15} | {c['email']}")
-    print("="*50)
+    print("\n" + "="*70)
+    print(f"{'ID':<5} | {'Họ và Tên':<20} | {'Số điện thoại':<15} | {'Email'}")
+    print("-" * 70)
+    for c in contacts:
+        print(f"{c['id']:<5} | {c['name']:<20} | {c['phone']:<15} | {c['email']}")
+    print("="*70)
 
 def tim_kiem(contacts):
-    """Tìm kiếm chính xác hoặc tìm kiếm chuỗi con [cite: 40, 52]"""
-    query = input("\nNhập tên cần tìm: ").strip().lower()
-    results = [c for c in contacts if query in c['name'].lower()]
+    query = input("\nNhập Tên hoặc ID cần tìm (VD: 01): ").strip().lower()
+    results = [c for c in contacts if query in c['name'].lower() or query == c['id']]
     
     if results:
         print(f"\nTìm thấy {len(results)} kết quả:")
@@ -77,19 +108,16 @@ def tim_kiem(contacts):
         print("\nKhông tìm thấy kết quả phù hợp.")
 
 def sap_xep_danh_ba(contacts):
-    """Sắp xếp theo tên từ A-Z [cite: 42, 74]"""
     contacts.sort(key=lambda x: x['name'].lower())
     print("\nĐã sắp xếp danh bạ theo tên.")
     hien_thi_danh_ba(contacts)
 
 def thong_ke(contacts):
-    """Thực hiện các phép toán thống kê cơ bản [cite: 44, 77]"""
     total = len(contacts)
     print(f"\n--- THỐNG KÊ ---")
     print(f"Tổng số liên hệ hiện có: {total}")
 
 def xuat_json(contacts):
-    """Chức năng nâng cao: Xuất dữ liệu ra JSON [cite: 56, 77]"""
     try:
         with open(JSON_FILE, "w", encoding="utf-8") as f:
             json.dump(contacts, f, indent=4, ensure_ascii=False)
@@ -100,7 +128,6 @@ def xuat_json(contacts):
 # --- MENU CHÍNH ---
 
 def hien_thi_menu():
-    """Hiển thị menu tương tác [cite: 31, 74]"""
     print("\n===== QUẢN LÝ DANH BẠ LIÊN HỆ =====")
     print("1. Thêm liên hệ mới")
     print("2. Hiển thị danh bạ")
@@ -117,18 +144,12 @@ def main():
         hien_thi_menu()
         choice = input("Lựa chọn của bạn (0-6): ")
         
-        if choice == '1':
-            them_lien_he(contacts)
-        elif choice == '2':
-            hien_thi_danh_ba(contacts)
-        elif choice == '3':
-            tim_kiem(contacts)
-        elif choice == '4':
-            sap_xep_danh_ba(contacts)
-        elif choice == '5':
-            thong_ke(contacts)
-        elif choice == '6':
-            xuat_json(contacts)
+        if choice == '1': them_lien_he(contacts)
+        elif choice == '2': hien_thi_danh_ba(contacts)
+        elif choice == '3': tim_kiem(contacts)
+        elif choice == '4': sap_xep_danh_ba(contacts)
+        elif choice == '5': thong_ke(contacts)
+        elif choice == '6': xuat_json(contacts)
         elif choice == '0':
             print("Cảm ơn bạn đã sử dụng ứng dụng!")
             break
