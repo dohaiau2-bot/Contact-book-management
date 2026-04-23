@@ -43,8 +43,7 @@ def them_lien_he(contacts):
     name = input("Nhập tên: ").strip()
     while not name:
         name = input("Tên không được để trống. Nhập lại: ").strip()
-    
-    phone = input("Nhập số điện thoại (VD: 0912345678): ").strip()
+    phone = input("Nhập số điện thoại (84+): ").strip()
     while not kiem_tra_sdt(phone):
         phone = input("SĐT không hợp lệ (Phải có 10 số, bắt đầu bằng 03, 05, 07, 08, 09). Nhập lại: ").strip()
         
@@ -52,7 +51,7 @@ def them_lien_he(contacts):
     contacts.append({"name": name, "phone": phone, "email": email})
     luu_du_lieu(contacts)
     print("Thêm thành công!")
-    
+
 def hien_thi_danh_ba(contacts):
     """Hiển thị danh sách dưới dạng bảng [cite: 38, 74]"""
     if not contacts:
