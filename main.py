@@ -63,15 +63,19 @@ def them_lien_he(contacts):
         else: break 
 
     email = input("Nhập email: ").strip()
-    # Tạo ID chuẩn 2 chữ số
-    new_id_num = max([int(c['id']) for c in contacts]) + 1 if contacts else 1
+
+    # --- THUẬT TOÁN TÌM ID TRỐNG NHỎ NHẤT ---
+    existing_ids = {int(c['id']) for c in contacts}
+    new_id_num = 1
+    while new_id_num in existing_ids:
+        new_id_num += 1
     unique_id = f"{new_id_num:02d}"
+    # ---------------------------------------
 
     contacts.append({"id": unique_id, "name": name, "phone": phone, "email": email})
     luu_du_lieu(contacts)
-    # Cập nhật luôn JSON nếu đã từng xuất
     if os.path.exists(JSON_FILE): xuat_json(contacts)
-    print(f"✅ Đã thêm thành công! ID: {unique_id}")
+    print(f"✅ Đã thêm thành công! ID mới cấp: {unique_id}")
 
 def xoa_lien_he(contacts):
     """Xóa triệt để mọi bản ghi trùng ID và đồng bộ tất cả tệp tin"""
@@ -157,9 +161,49 @@ def tim_kiem(contacts):
     results = [c for c in contacts if query in c['name'].lower() or query == c['id']]
     hien_thi_danh_ba(results) if results else print("\nKhông tìm thấy kết quả.")
 
+def vietnamese_sort_key(full_name):
+    """
+    Hàm này chuẩn hóa tên để máy tính sắp xếp đúng chuẩn Tiếng Việt.
+    Nó sẽ lấy Tên cuối cùng để so sánh trước.
+    """
+    if not full_name: return ""
+    
+    # Bảng quy đổi ký tự Tiếng Việt sang một chuỗi có thể sắp xếp theo thứ tự Unicode
+    # Chúng ta thay các chữ có dấu thành các ký tự đặc biệt để 'ă' luôn sau 'a', 'â' luôn sau 'ă', v.v.
+    dict_map = {
+        'a': 'a0', 'à': 'a1', 'ả': 'a2', 'ã': 'a3', 'á': 'a4', 'ạ': 'a5',
+        'ă': 'a6', 'ằ': 'a7', 'ẳ': 'a8', 'ẵ': 'a9', 'ắ': 'a10', 'ặ': 'a11',
+        'â': 'a12', 'ầ': 'a13', 'ẩ': 'a14', 'ẫ': 'a15', 'ấ': 'a16', 'ậ': 'a17',
+        'đ': 'd1', 'd': 'd0',
+        'e': 'e0', 'è': 'e1', 'ẻ': 'e2', 'ẽ': 'e3', 'é': 'e4', 'ẹ': 'e5',
+        'ê': 'e6', 'ề': 'e7', 'ể': 'e8', 'ễ': 'e9', 'ế': 'e10', 'ệ': 'e11',
+        # Bạn có thể thêm i, o, u tương tự, nhưng đây là những chữ cái gây lỗi nhất
+    }
+
+    def convert_word(word):
+        res = ""
+        for char in word.lower():
+            res += dict_map.get(char, char)
+        return res
+
+    parts = full_name.strip().split()
+    if not parts: return ""
+    
+    # Trình tự: Ưu tiên Tên cuối cùng -> sau đó là Họ lót
+    last_name = convert_word(parts[-1])
+    full_normalized = convert_word(" ".join(parts))
+    
+    return (last_name, full_normalized)
+
 def sap_xep_danh_ba(contacts):
-    contacts.sort(key=lambda x: x['name'].lower())
-    print("\nĐã sắp xếp danh bạ theo tên.")
+    if not contacts:
+        print("\nDanh bạ trống.")
+        return
+
+    # Sắp xếp danh sách gốc dựa trên key Tiếng Việt
+    contacts.sort(key=lambda x: vietnamese_sort_key(x['name']))
+    
+    print("\n✅ Đã sắp xếp danh bạ theo Tên (A-Z).")
     hien_thi_danh_ba(contacts)
 
 def thong_ke(contacts):
