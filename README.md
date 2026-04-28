@@ -16,7 +16,7 @@ Sửa đổi: Cho phép cập nhật thông tin liên hệ dựa trên mã ID.
 
 Xóa: Loại bỏ liên hệ khỏi hệ thống (cập nhật đồng bộ cả file .txt và .json).
 
- ## 2. Xử lý nâng cao (Advanced Logic - Điểm 8)
+ ## 2. Xử lý nâng cao (Advanced Logic)
 Tìm kiếm chuỗi con (Substring Search): Tìm kiếm liên hệ dựa trên một phần tên người dùng nhập vào.
 
 Lọc theo điều kiện (Filtering): Lọc danh sách liên hệ theo đầu số nhà mạng (035, 090...) hoặc theo tên miền Email (gmail.com, yahoo.com...).
