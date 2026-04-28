@@ -76,3 +76,24 @@ contacts.txt: Tệp lưu trữ dữ liệu thô (ngăn cách bởi dấu |).
 contacts.json: Tệp xuất dữ liệu định dạng JSON (dùng cho tính năng nâng cao).
 
 README.md: Tệp hướng dẫn này.
+
+##  Bảng Tự Đánh Giá (Self-Grading Rubric)
+
+Dựa trên yêu cầu của học phần **Programming Methods**, dưới đây là bảng tự đánh giá các tính năng đã triển khai trong dự án:
+
+| Thành phần (Component) | Tiêu chí chi tiết (Detailed Criteria) | Trạng thái | Điểm (Points) |
+| :--- | :--- | :---: | :---: |
+| **1. CLI Menu System** | [cite_start]Sử dụng vòng lặp vô hạn `while True`, xử lý tốt các lựa chọn không hợp lệ mà không làm dừng chương trình. | ✅ | 1.0 |
+| **2. Data Input & Validation** | Thêm bản ghi mới thành công. [cite_start]Xác thực dữ liệu số điện thoại bằng Regex và chặn tên trống. | ✅ | 1.0 |
+| **3. Data Display** | [cite_start]In danh sách liên hệ dưới dạng bảng có căn lề cột rõ ràng và tiêu đề bảng. | ✅ | 1.0 |
+| **4. Basic Search** | [cite_start]Tìm kiếm và xử lý chính xác liên hệ dựa trên mã ID cụ thể (trong chức năng Xóa/Sửa)[cite: 40, 74]. | ✅ | 1.0 |
+| **5. Sorting Mechanism** | [cite_start]Triển khai thuật toán sắp xếp danh sách theo tên (A-Z) hỗ trợ đầy đủ ký tự Tiếng Việt. | ✅ | 1.0 |
+| **6. Basic Calculation** | [cite_start]Tính toán chính xác tổng số lượng liên hệ có trong hệ thống[cite: 44, 77]. | ✅ | 1.0 |
+| **7. TXT File Handling** | [cite_start]Lưu và tải dữ liệu từ tệp `contacts.txt` ổn định, không làm mất dữ liệu khi khởi động lại. | ✅ | 1.0 |
+| **8. [Advanced] Complex Logic** | [cite_start]Triển khai tìm kiếm chuỗi con (substring) và thống kê phân nhóm theo tên miền Email[cite: 52, 54, 77]. | ✅ | 1.0 |
+| **9. [Advanced] JSON/DBMS** | [cite_start]Xuất dữ liệu thành công ra định dạng tệp `contacts.json` cấu trúc. | ✅ | 1.0 |
+| **10. Git & Modular Code** | [cite_start]Mã nguồn chia nhỏ thành các hàm chuyên biệt (Top-Down Design), có README và lịch sử Commit[cite: 58, 64, 77]. | ✅ | 1.0 |
+| **TỔNG CỘNG** | | | **10.0 / 10.0** |
+
+---
+*Ghi chú: Điểm số dựa trên việc đối chiếu mã nguồn với file "Chapter 3 - Mini project.pdf".*
